@@ -6,27 +6,28 @@ import requests
 import smtplib
 from email.message import EmailMessage
 from collections import defaultdict
+import os
 
 HONEYPOT_PORT = 2222
 DB_PATH = 'honeypot.db'
 brute_force_attempts = defaultdict(int)
 
-# Email and Twilio Config (replace with your credentials)
-EMAIL_SENDER = '***********'
-EMAIL_PASSWORD = '***********'
-EMAIL_RECEIVER = "*************"
+# Email and Twilio Config (use environment variables for credentials)
+EMAIL_SENDER = os.environ.get('EMAIL_SENDER')
+EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+EMAIL_RECEIVER = os.environ.get('EMAIL_RECEIVER')
 
-TWILIO_SID = '***********'
-TWILIO_AUTH_TOKEN = '*************'
-TWILIO_FROM = '*************'
-TWILIO_TO = '*************'
+TWILIO_SID = os.environ.get('TWILIO_SID')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
+TWILIO_FROM = os.environ.get('TWILIO_FROM')
+TWILIO_TO = os.environ.get('TWILIO_TO')
 
 def geoip_lookup(ip):
     try:
         r = requests.get(f'http://ip-api.com/json/{ip}', timeout=5)
         data = r.json()
         return data.get("country", "Unknown"), f'{data.get("city", "")}, {data.get("regionName", "")}'
-    except:
+    except Exception:
         return "Unknown", "Unknown"
 
 def send_email_alert(ip, port):
@@ -75,7 +76,14 @@ def log_to_db(data):
 
 def handle_connection(client_socket, addr):
     src_ip, src_port = addr
-    dest_ip = socket.gethostbyname(socket.gethostname())
+    # Get local IP address in a reliable way
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        dest_ip = s.getsockname()[0]
+        s.close()
+    except Exception:
+        dest_ip = '127.0.0.1'
     dest_port = HONEYPOT_PORT
     country, location = geoip_lookup(src_ip)
 

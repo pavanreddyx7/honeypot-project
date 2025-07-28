@@ -1,2 +1,2 @@
-geoip2
-twilio
+geoip2==4.7.0
+twilio==8.10.0
