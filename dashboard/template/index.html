@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Honeypot Dashboard</title>
+    <style>
+        body { font-family: Arial; background: #111; color: #eee; }
+        h1 { color: cyan; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 8px; border: 1px solid #444; text-align: center; }
+        th { background-color: #333; }
+        tr:nth-child(even) { background-color: #222; }
+    </style>
+</head>
+<body>
+    <h1>🚨 Honeypot Logs Dashboard</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Timestamp</th>
+            <th>Src IP</th>
+            <th>Src Port</th>
+            <th>Dest IP</th>
+            <th>Dest Port</th>
+            <th>Location</th>
+            <th>Country</th>
+            <th>Attack Type</th>
+            <th>Brute Force</th>
+        </tr>
+        {% for log in logs %}
+        <tr>
+            {% for item in log %}
+            <td>{{ item }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
